@@ -962,6 +962,10 @@ type loadOptions struct {
 
 	// The types of specific columns can be specified via column name.
 	types map[string]series.Type
+
+	// Optional timezone normalization configuration. When nil (the
+	// default), loading behaves exactly as before.
+	tzNorm *TimezoneNormalization
 }
 
 // DefaultType sets the defaultType option for loadOptions.
@@ -1262,6 +1266,17 @@ func LoadRecords(records [][]string, options ...LoadOption) DataFrame {
 	fixColnames(colnames)
 	for i, colname := range colnames {
 		df.columns[i].Name = colname
+	}
+
+	if cfg.tzNorm != nil {
+		// Optional timezone normalization: the raw records (untouched by
+		// NaNValues replacement and type detection) are combined with the
+		// per-row timezone, the business sequence and the duration
+		// constraint table to append a UTC column. The original row order
+		// and all other columns are preserved.
+		if err := df.applyTimezoneNormalization(cfg, records); err != nil {
+			return DataFrame{Err: err}
+		}
 	}
 	return df
 }

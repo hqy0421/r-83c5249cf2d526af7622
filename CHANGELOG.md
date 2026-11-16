@@ -5,6 +5,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This document follows
 [markdownlint](https://github.com/markdownlint/markdownlint) formatting rules.
 
+## [Unreleased]
+
+### Added in Unreleased
+
+- Add optional timezone normalization for `LoadRecords`/`ReadCSV` (and
+  readers built on them) via `dataframe.WithTimezoneNormalization`: per-row
+  IANA timezones, per-entity business sequences and an event duration
+  constraint table are combined to append a UTC column that is only loaded
+  when every local time has a unique UTC interpretation. Non-existent local
+  times, constraint conflicts and remaining ambiguities are reported as
+  distinct issue kinds in `TimezoneNormalizationError`; ambiguous rows list
+  all valid UTC interpretations without choosing one by default
+
 ## [0.12.0] - 2021-10-10
 
 ### Added in 0.12.0
